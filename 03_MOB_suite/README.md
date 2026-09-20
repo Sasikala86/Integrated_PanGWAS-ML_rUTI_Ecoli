@@ -4,13 +4,14 @@
 
 MOB-suite v3.1.9 was applied to all 491 E. coli genome assemblies to identify chromosome- and plasmid-associated sequences and reconstruct putative plasmids.
 
+```text
 491 E. coli genomes
         │
         ▼
    MOB-suite mob_recon
         │
         ▼
- mob_output/<isolate>/
+mob_output/<isolate>/
         │
    ┌────┴──────────────┐
    │                   │
@@ -23,11 +24,12 @@ Chromosome          Plasmids
                        ▼
               Plasmid QC analysis
                        │
-             ┌─────────┴─────────┐
-             │                   │
-             ▼                   ▼
+              ┌────────┴─────────┐
+              │                  │
+              ▼                  ▼
         PlasmidFinder       Plasmid Panaroo
         validation
+```
 Scripts
 01_mobsuite_batch.sh — runs mob_recon on all genome assemblies.
 02_collect_plasmids.sh — collects plasmid FASTA files from individual MOB-suite output directories.
