@@ -1,0 +1,117 @@
+# ==============================================================================
+# iTOL annotation from phylogroups.treeIDs.txt
+# Clinical group derived from TreeID prefix
+# ==============================================================================
+
+library(dplyr)
+library(readr)
+
+# ------------------------------------------------------------------------------
+# 1. INPUT FILE
+# ------------------------------------------------------------------------------
+phylo_file <- "phylogroups.treeIDs.txt"
+
+# ------------------------------------------------------------------------------
+# 2. LOAD DATA (TreeID must already match tree labels)
+# ------------------------------------------------------------------------------
+df <- read_tsv(
+  phylo_file,
+  col_names = c("TreeID", "Phylogroup"),
+  show_col_types = FALSE
+)
+
+# ------------------------------------------------------------------------------
+# 3. DERIVE CLINICAL GROUP FROM TreeID
+# ------------------------------------------------------------------------------
+df <- df %>%
+  mutate(
+    ClinicalGroup = case_when(
+      grepl("^rUTI", TreeID) ~ "rUTI",
+      grepl("^UTI",  TreeID) ~ "UTI",
+      TRUE ~ "Unknown"
+    )
+  )
+
+# ------------------------------------------------------------------------------
+# 4. PREVALENCE TABLES (FOR PAPER)
+# ------------------------------------------------------------------------------
+phylo_prev <- df %>%
+  count(Phylogroup) %>%
+  mutate(Percentage = round(n / sum(n) * 100, 1))
+
+clinical_prev <- df %>%
+  count(ClinicalGroup) %>%
+  mutate(Percentage = round(n / sum(n) * 100, 1))
+
+write_csv(phylo_prev, "Phylogroup_Prevalence.csv")
+write_csv(clinical_prev, "ClinicalGroup_Prevalence.csv")
+
+# ------------------------------------------------------------------------------
+# 5. COLOR DEFINITIONS
+# ------------------------------------------------------------------------------
+phylo_colors <- c(
+  "A"  = "#E41A1C",
+  "B1" = "#377EB8",
+  "B2" = "#4DAF4A",
+  "C"  = "#984EA3",
+  "D"  = "#FF7F00",
+  "E"  = "#FFFF33",
+  "F"  = "#A65628",
+  "Unknown" = "#000000"
+)
+
+clinical_colors <- c(
+  "rUTI" = "#E41A1C",
+  "UTI"  = "#377EB8",
+  "Unknown" = "#000000"
+)
+
+# ------------------------------------------------------------------------------
+# 6. FUNCTION TO WRITE iTOL COLORSTRIP
+# ------------------------------------------------------------------------------
+write_itol <- function(ids, groups, colors, label, outfile) {
+
+  color_vec <- colors[groups]
+  color_vec[is.na(color_vec)] <- "#000000"
+
+  header <- c(
+    "DATASET_COLORSTRIP",
+    "SEPARATOR COMMA",
+    paste0("DATASET_LABEL,", label),
+    "COLOR,#000000",
+    paste0("LEGEND_TITLE,", label),
+    "STRIP_WIDTH,50",
+    "MARGIN,10",
+    "BORDER_WIDTH,1",
+    "BORDER_COLOR,#000000",
+    paste0("LEGEND_SHAPES,", paste(rep("1", length(colors)), collapse = ",")),
+    paste0("LEGEND_COLORS,", paste(colors, collapse = ",")),
+    paste0("LEGEND_LABELS,", paste(names(colors), collapse = ","))
+  )
+
+  data_lines <- paste(ids, color_vec, groups, sep = ",")
+
+  writeLines(c(header, "DATA", data_lines), outfile)
+}
+
+# ------------------------------------------------------------------------------
+# 7. WRITE iTOL FILES
+# ------------------------------------------------------------------------------
+write_itol(
+  ids    = df$TreeID,
+  groups = df$Phylogroup,
+  colors = phylo_colors,
+  label  = "Phylogroup",
+  outfile = "iTOL_phylogroup_annotation.txt"
+)
+
+write_itol(
+  ids    = df$TreeID,
+  groups = df$ClinicalGroup,
+  colors = clinical_colors,
+  label  = "Clinical Group",
+  outfile = "iTOL_clinicalgroup_annotation.txt"
+)
+
+message("✅ DONE: Upload both annotation files to iTOL")
+
