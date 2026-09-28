@@ -1,0 +1,13 @@
+1. Generate the Distance Matrix
+python phylogeny_distance.py rUTI_UTI_filtered.final_tree.tre > phylogeny_matrix.tsv
+
+2.Run the Corrected GWAS
+pyseer \
+  --pres accessory_gene_presence_absence_for_pyseer.tsv \
+  --phenotypes traits_ecoli_binary.tsv \
+  --distances phylogeny_matrix.tsv \
+  --save-m mds_components \
+  --min-af 0.01 \
+  --max-af 0.99 \
+  > pyseer_accessory_results.txt
+
