@@ -1,0 +1,8 @@
+(scoary_env) sastra@Sastra:~/Sasikala/Pangenome/PanGWAS_Accessory$ scoary -g gene_presence_absence_accessory_Scoary.csv \
+       -t traits_scoary.csv \
+       -o scoary_results \
+       --threads 4 \
+       -p 0.05 \
+       -c BH \
+       --collapse \
+       -s 4
