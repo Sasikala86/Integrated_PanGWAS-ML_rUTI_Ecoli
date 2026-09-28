@@ -1,0 +1,4 @@
+dataset,total_genes,core_genes,soft_core_genes,shell_genes,rare_genes
+chromosome,19570,3087,269,2492,12250
+plasmid,5925,0,0,254,5199
+combined,22681,3099,263,2714,14736
